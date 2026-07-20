@@ -68,7 +68,7 @@
             </div>
             <?php if(isset($pager)): ?>
             <div class="d-flex justify-content-center mt-3">
-                <?= $pager->links('default', 'bootstrap_full') ?>
+                <?= $pager->links() ?>
             </div>
             <?php endif; ?>
         </div>

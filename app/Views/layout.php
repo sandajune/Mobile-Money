@@ -24,6 +24,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="<?= base_url('client/historique') ?>"><i class="bi bi-clock-history"></i> Historique</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('client/tarifs') ?>"><i class="bi bi-currency-dollar"></i> Tarifs</a>
+                    </li>
                     <!-- Boutons vides pour Tsiory -->
                     <li class="nav-item">
                         <button class="nav-link btn btn-link text-white" disabled><i class="bi bi-cash-coin"></i> Dépôt (Tsiory)</button>
@@ -46,8 +49,8 @@
             </div>
         </div>
     </nav>
-    <?php else: ?>
-    <!-- Navbar Opérateur -->
+    <?php elseif(session()->get('isOperatorLoggedIn')): ?>
+    <!-- Navbar Opérateur Connecté -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <a class="navbar-brand" href="<?= base_url('operateur/prefixes') ?>"><i class="bi bi-gear"></i> M-Money Opérateur</a>
@@ -64,8 +67,33 @@
                     </li>
                 </ul>
                 <div class="navbar-nav ms-auto">
+                    <span class="nav-link text-white">
+                        <i class="bi bi-person-circle"></i> <?= session()->get('operator_nom') ?>
+                    </span>
+                    <a class="nav-link btn btn-danger btn-sm text-white ms-2" href="<?= base_url('operateur/logout') ?>">
+                        <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <?php else: ?>
+    <!-- Navbar Opérateur Non Connecté -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="<?= base_url('operateur/login') ?>"><i class="bi bi-gear"></i> M-Money Opérateur</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#operatorNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="operatorNavbar">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('operateur/login') ?>"><i class="bi bi-box-arrow-in-right"></i> Connexion Opérateur</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav ms-auto">
                     <a class="nav-link text-white" href="<?= base_url('login') ?>">
-                        <i class="bi bi-box-arrow-in-right"></i> Espace Client
+                        <i class="bi bi-person"></i> Espace Client
                     </a>
                 </div>
             </div>

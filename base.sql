@@ -10,8 +10,20 @@ DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS bareme_frais;
 DROP TABLE IF EXISTS config_prefixes;
 DROP TABLE IF EXISTS clients;
+DROP TABLE IF EXISTS operateurs;
 
 PRAGMA foreign_keys = ON;
+
+-- =====================================================================
+-- 0. TABLE : OPÉRATEURS (AUTHENTIFICATION)
+-- =====================================================================
+CREATE TABLE operateurs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    nom TEXT NOT NULL,
+    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
 -- =====================================================================
 -- 1. TABLE : CONFIGURATION DES PRÉFIXES
@@ -101,6 +113,9 @@ INSERT INTO config_prefixes (nom_operateur, prefixe) VALUES ('Yas', '038');
 -- Correction des clients de test (Nom et téléphone associés)
 INSERT INTO clients (nom_clients, telephone, solde) VALUES ('Sanda', '0331234567', 50000.0);
 INSERT INTO clients (nom_clients, telephone, solde) VALUES ('Tsiory', '0379876543', 500.0);
+
+-- Opérateur de test (mot de passe: admin123 - à hasher en production)
+INSERT INTO operateurs (username, password, nom) VALUES ('admin', 'admin123', 'Administrateur Principal');
 
 
 
