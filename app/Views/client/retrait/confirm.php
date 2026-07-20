@@ -3,8 +3,8 @@
 <?= $this->section('content') ?>
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow border-warning">
-            <div class="card-header bg-warning text-dark">
+        <div class="card shadow-sm border-warning">
+            <div class="card-header bg-warning text-white">
                 <h4 class="mb-0"><i class="bi bi-check-circle"></i> Confirmer le retrait</h4>
             </div>
             <div class="card-body p-4">
@@ -42,7 +42,7 @@
                     <form action="<?= base_url('client/retrait/store') ?>" method="post" class="flex-fill">
                         <?= csrf_field() ?>
                         <input type="hidden" name="montant" value="<?= esc($montant) ?>">
-                        <button type="submit" class="btn btn-warning text-dark w-100">
+                        <button type="submit" class="btn btn-warning w-100">
                             <i class="bi bi-check-lg"></i> Confirmer le retrait
                         </button>
                     </form>

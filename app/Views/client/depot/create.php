@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow">
+        <div class="card shadow-sm">
             <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0"><i class="bi bi-cash-coin"></i> Effectuer un dépôt</h4>
                 <a href="<?= base_url('client/dashboard') ?>" class="btn btn-sm btn-light">

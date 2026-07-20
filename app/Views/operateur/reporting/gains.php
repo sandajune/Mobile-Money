@@ -1,15 +1,18 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-graph-up-arrow"></i> Situation des Gains</h2>
+<div class="page-header">
+    <div>
+        <h1 class="h3 mb-0">Situation des gains</h1>
+        <p class="page-subtitle">Suivi des revenus générés par les frais d'opération.</p>
+    </div>
     <a href="<?= base_url('operateur/reporting/clients') ?>" class="btn btn-outline-secondary">
-        <i class="bi bi-people"></i> Comptes Clients
+        <i class="bi bi-people"></i> Comptes clients
     </a>
 </div>
 
 <!-- Filtre par période -->
-<div class="card shadow mb-4">
+<div class="card shadow-sm mb-4">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
             <div class="col-md-4">
@@ -35,42 +38,42 @@
 <!-- Cartes chiffres clés -->
 <div class="row mb-4 g-3">
     <div class="col-md-4">
-        <div class="card text-white bg-dark shadow h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-currency-dollar fs-1 opacity-75"></i>
-                <h5 class="card-title mt-2">Total des Gains</h5>
-                <p class="display-6 fw-bold"><?= number_format($total_gains, 0, '', ' ') ?> Ar</p>
+        <div class="stat-card h-100">
+            <div class="stat-icon bg-primary-subtle text-primary">
+                <i class="bi bi-currency-exchange"></i>
             </div>
+            <div class="stat-label">Total des gains</div>
+            <div class="stat-value"><?= number_format($total_gains, 0, '', ' ') ?> Ar</div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card text-dark bg-warning shadow h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-cash-stack fs-1 opacity-75"></i>
-                <h5 class="card-title mt-2">Gains sur Retraits</h5>
-                <?php $r = $gains['retrait'] ?? null; ?>
-                <p class="display-6 fw-bold"><?= $r ? number_format($r['total_frais'], 0, '', ' ') : 0 ?> Ar</p>
-                <small><?= $r ? $r['nb_operations'] : 0 ?> opération(s)</small>
+        <div class="stat-card h-100">
+            <div class="stat-icon bg-warning-subtle text-warning">
+                <i class="bi bi-cash-stack"></i>
             </div>
+            <div class="stat-label">Gains sur retraits</div>
+            <?php $r = $gains['retrait'] ?? null; ?>
+            <div class="stat-value"><?= $r ? number_format($r['total_frais'], 0, '', ' ') : 0 ?> Ar</div>
+            <small class="text-muted"><?= $r ? $r['nb_operations'] : 0 ?> opération(s)</small>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card text-white bg-success shadow h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-arrow-left-right fs-1 opacity-75"></i>
-                <h5 class="card-title mt-2">Gains sur Transferts</h5>
-                <?php $t = $gains['transfert_envoi'] ?? null; ?>
-                <p class="display-6 fw-bold"><?= $t ? number_format($t['total_frais'], 0, '', ' ') : 0 ?> Ar</p>
-                <small><?= $t ? $t['nb_operations'] : 0 ?> opération(s)</small>
+        <div class="stat-card h-100">
+            <div class="stat-icon bg-success-subtle text-success">
+                <i class="bi bi-arrow-left-right"></i>
             </div>
+            <div class="stat-label">Gains sur transferts</div>
+            <?php $t = $gains['transfert_envoi'] ?? null; ?>
+            <div class="stat-value"><?= $t ? number_format($t['total_frais'], 0, '', ' ') : 0 ?> Ar</div>
+            <small class="text-muted"><?= $t ? $t['nb_operations'] : 0 ?> opération(s)</small>
         </div>
     </div>
 </div>
 
 <!-- Tableau détaillé -->
-<div class="card shadow">
-    <div class="card-header bg-dark text-white">
-        <h5 class="mb-0"><i class="bi bi-table"></i> Détail par type d'opération</h5>
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <i class="bi bi-table"></i> Détail par type d'opération
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -89,7 +92,7 @@
                         <tr>
                             <td>
                                 <?php if ($type === 'retrait'): ?>
-                                    <span class="badge bg-warning text-dark fs-6"><i class="bi bi-cash-stack"></i> Retrait</span>
+                                    <span class="badge bg-warning fs-6"><i class="bi bi-cash-stack"></i> Retrait</span>
                                 <?php else: ?>
                                     <span class="badge bg-success fs-6"><i class="bi bi-arrow-left-right"></i> Transfert (envoi)</span>
                                 <?php endif; ?>

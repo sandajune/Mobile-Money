@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow border-primary">
+        <div class="card shadow-sm border-primary">
             <div class="card-header bg-primary text-white">
                 <h4 class="mb-0"><i class="bi bi-check-circle"></i> Confirmer le transfert</h4>
             </div>

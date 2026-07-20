@@ -1,22 +1,16 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Modifier le Préfixe</h2>
-        <a href="<?= base_url('operateur/prefixes') ?>" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Retour
-        </a>
+<div class="page-header">
+    <div>
+        <h1 class="h3 mb-0">Modifier le préfixe</h1>
     </div>
+    <a href="<?= base_url('operateur/prefixes') ?>" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Retour
+    </a>
+</div>
 
-    <?php if (session()->get('error')): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?= session()->get('error') ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    <?php endif; ?>
-
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body">
             <form action="<?= base_url('operateur/prefixes/update/' . $prefixe['id']) ?>" method="post">
                 <div class="mb-3">
@@ -35,11 +29,10 @@
                     <input type="text" class="form-control" value="<?= date('d/m/Y H:i', strtotime($prefixe['date_creation'])) ?>" disabled>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <a href="<?= base_url('operateur/prefixes') ?>" class="btn btn-secondary">Annuler</a>
+                    <a href="<?= base_url('operateur/prefixes') ?>" class="btn btn-outline-secondary">Annuler</a>
                     <button type="submit" class="btn btn-primary">Mettre à jour</button>
                 </div>
             </form>
         </div>
     </div>
-</div>
 <?= $this->endSection() ?>

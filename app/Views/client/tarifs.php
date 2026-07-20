@@ -1,17 +1,15 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-currency-dollar"></i> Tarifs en vigueur</h2>
-        <a href="<?= base_url('client/dashboard') ?>" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Retour au tableau de bord
-        </a>
+<div class="page-header">
+    <div>
+        <h1 class="h3 mb-0">Tarifs en vigueur</h1>
+        <p class="page-subtitle">Ces tarifs sont appliqués automatiquement lors de vos opérations.</p>
     </div>
-
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> Ces tarifs sont appliqués automatiquement lors de vos opérations.
-    </div>
+    <a href="<?= base_url('client/dashboard') ?>" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+    </a>
+</div>
 
     <ul class="nav nav-tabs mb-4" id="tarifsTabs" role="tablist">
         <li class="nav-item">
@@ -30,7 +28,7 @@
         <!-- Retraits -->
         <div class="tab-pane fade show active" id="retrait">
             <div class="card">
-                <div class="card-header bg-warning text-dark">
+                <div class="card-header bg-warning text-white">
                     <h5 class="mb-0">Barème des frais de retrait</h5>
                 </div>
                 <div class="card-body">
@@ -103,5 +101,4 @@
             </div>
         </div>
     </div>
-</div>
 <?= $this->endSection() ?>

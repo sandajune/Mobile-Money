@@ -55,9 +55,20 @@ class ReportingController extends BaseController
             $builder->like('c.telephone', $search);
         }
 
+        $tous    = $builder->get()->getResultArray();
+        $total   = count($tous);
+        $perPage = 10;
+        $page    = max((int) ($this->request->getGet('page') ?? 1), 1);
+        $clients = array_slice($tous, ($page - 1) * $perPage, $perPage);
+
+        $pager = service('pager');
+        $pager->makeLinks($page, $perPage, $total, 'pager_bootstrap');
+
         return view('operateur/reporting/clients', [
-            'clients' => $builder->get()->getResultArray(),
+            'clients' => $clients,
             'search'  => $search,
+            'pager'   => $pager,
+            'total'   => $total,
         ]);
     }
 }

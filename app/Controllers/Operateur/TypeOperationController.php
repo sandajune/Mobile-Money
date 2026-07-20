@@ -6,9 +6,10 @@ use App\Models\BaremeFraisModel;
 class TypeOperationController extends BaseController {
     public function index() {
         $model = new BaremeFraisModel();
-        // Regroupement par type pour la vue générale
-        $data['retraits'] = $model->where('type_operation', 'retrait')->orderBy('montant_min', 'ASC')->findAll();
-        $data['transferts'] = $model->where('type_operation', 'transfert')->orderBy('montant_min', 'ASC')->findAll();
+        // Regroupement par type pour la vue générale, chacun avec sa propre pagination
+        $data['retraits']   = $model->where('type_operation', 'retrait')->orderBy('montant_min', 'ASC')->paginate(10, 'retraits');
+        $data['transferts'] = $model->where('type_operation', 'transfert')->orderBy('montant_min', 'ASC')->paginate(10, 'transferts');
+        $data['pager']      = $model->pager;
         return view('operateur/frais/index', $data);
     }
 

@@ -3,10 +3,10 @@
 <?= $this->section('content') ?>
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0"><i class="bi bi-cash-stack"></i> Effectuer un retrait</h4>
-                <a href="<?= base_url('client/dashboard') ?>" class="btn btn-sm btn-dark">
+                <a href="<?= base_url('client/dashboard') ?>" class="btn btn-sm btn-light">
                     <i class="bi bi-arrow-left"></i> Retour
                 </a>
             </div>
@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-warning btn-lg text-dark">
+                        <button type="submit" class="btn btn-warning btn-lg">
                             <i class="bi bi-eye"></i> Prévisualiser le retrait
                         </button>
                     </div>

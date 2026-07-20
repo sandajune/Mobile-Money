@@ -7,7 +7,8 @@ use App\Models\ClientModel;
 class PrefixeController extends BaseController {
     public function index() {
         $model = new PrefixeModel();
-        $data['prefixes'] = $model->findAll();
+        $data['prefixes'] = $model->orderBy('id', 'DESC')->paginate(10, 'default');
+        $data['pager']    = $model->pager;
         return view('operateur/prefixes/index', $data);
     }
 

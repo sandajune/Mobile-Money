@@ -1,15 +1,18 @@
 <?= $this->extend('layout') ?>
 
 <?= $this->section('content') ?>
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-people"></i> Situation des Comptes Clients</h2>
+<div class="page-header">
+    <div>
+        <h1 class="h3 mb-0">Situation des comptes clients</h1>
+        <p class="page-subtitle">Vue d'ensemble des comptes et de leurs soldes.</p>
+    </div>
     <a href="<?= base_url('operateur/reporting/gains') ?>" class="btn btn-outline-secondary">
         <i class="bi bi-graph-up-arrow"></i> Gains
     </a>
 </div>
 
 <!-- Barre de recherche -->
-<div class="card shadow mb-4">
+<div class="card shadow-sm mb-4">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
             <div class="col-md-8">
@@ -33,10 +36,10 @@
 </div>
 
 <!-- Tableau clients -->
-<div class="card shadow">
+<div class="card shadow-sm">
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-table"></i> Liste des clients</h5>
-        <span class="badge bg-secondary"><?= count($clients) ?> client(s)</span>
+        <span><i class="bi bi-table"></i> Liste des clients</span>
+        <span class="badge bg-secondary"><?= $total ?? count($clients) ?> client(s)</span>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -80,6 +83,11 @@
                 </tbody>
             </table>
         </div>
+        <?php if (isset($pager)): ?>
+        <div class="d-flex justify-content-center mt-3">
+            <?= $pager->links('default', 'pager_bootstrap') ?>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 <?= $this->endSection() ?>
