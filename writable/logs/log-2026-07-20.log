@@ -76,3 +76,29 @@ in SYSTEMPATH/Pager/Pager.php on line 124.
 12 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
 13 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
 14 SYSTEMPATH/rewrite.php(44): require_once('/home/sanda/Documents/S4/Mobile-Money/public/index.php')
+CRITICAL - 2026-07-20 07:35:04 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "operateur/prefixes/index.php"
+[Method: GET, Route: operateur/prefixes]
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Operateur/PrefixeController.php(11): view()
+ 4 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\Operateur\PrefixeController->index()
+ 5 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 7 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+ 9 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+10 SYSTEMPATH/rewrite.php(44): require_once('/home/sanda/Documents/S4/Mobile-Money/public/index.php')
+CRITICAL - 2026-07-20 07:36:16 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "operateur/prefixes/index.php"
+[Method: GET, Route: operateur/prefixes]
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Operateur/PrefixeController.php(11): view()
+ 4 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\Operateur\PrefixeController->index()
+ 5 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 7 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+ 9 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+10 SYSTEMPATH/rewrite.php(44): require_once('/home/sanda/Documents/S4/Mobile-Money/public/index.php')
