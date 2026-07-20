@@ -53,6 +53,7 @@ $routes->group('operateur', function($routes) {
         // Reporting
         $routes->get('reporting/gains', 'Operateur\ReportingController::gains');
         $routes->get('reporting/clients', 'Operateur\ReportingController::clients');
+        $routes->get('reporting/settlements', 'Operateur\ReportingController::settlements');
 
         // Préfixes
         $routes->get('prefixes', 'Operateur\PrefixeController::index');

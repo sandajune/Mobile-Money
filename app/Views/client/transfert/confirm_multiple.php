@@ -8,9 +8,15 @@
                 <h4 class="mb-0"><i class="bi bi-check-circle"></i> Confirmer l'envoi multiple</h4>
             </div>
             <div class="card-body p-4">
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> Vérifiez les informations avant de confirmer. Cette action est irréversible.
-                </div>
+                <?php if ($frais_inclus): ?>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Les frais et commissions sont inclus dans le montant saisi. Le montant net envoyé sera inférieur au montant débité.
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Vérifiez les informations avant de confirmer. Cette action est irréversible.
+                    </div>
+                <?php endif; ?>
 
                 <h5 class="mb-3">Détails des envois</h5>
                 <div class="table-responsive mb-4">
@@ -19,10 +25,17 @@
                             <tr>
                                 <th>Destinataire</th>
                                 <th>Numéro</th>
-                                <th>Montant reçu</th>
-                                <th>Frais</th>
-                                <th>Commission</th>
-                                <th>Total</th>
+                                <?php if ($frais_inclus): ?>
+                                    <th>Total débité</th>
+                                    <th>Frais</th>
+                                    <th>Commission</th>
+                                    <th>Montant net reçu</th>
+                                <?php else: ?>
+                                    <th>Montant reçu</th>
+                                    <th>Frais</th>
+                                    <th>Commission</th>
+                                    <th>Total</th>
+                                <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
@@ -30,24 +43,43 @@
                                 <tr>
                                     <td><?= esc($detail['nom']) ?></td>
                                     <td><span data-phone-display><?= esc($detail['telephone']) ?></span></td>
-                                    <td class="fw-bold"><?= number_format($detail['montant'], 0, '', ' ') ?> Ar</td>
-                                    <td class="text-danger"><?= number_format($detail['frais'], 0, '', ' ') ?> Ar</td>
-                                    <td class="text-warning">
-                                        <?php if ($detail['est_externe']): ?>
-                                            <?= number_format($detail['commission'], 0, '', ' ') ?> Ar
-                                            <span class="badge bg-warning text-dark ms-1">Externe</span>
-                                        <?php else: ?>
-                                            0 Ar
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="fw-bold"><?= number_format($detail['total'], 0, '', ' ') ?> Ar</td>
+                                    <?php if ($frais_inclus): ?>
+                                        <td class="fw-bold"><?= number_format($detail['total'], 0, '', ' ') ?> Ar</td>
+                                        <td class="text-danger"><?= number_format($detail['frais'], 0, '', ' ') ?> Ar</td>
+                                        <td class="text-warning">
+                                            <?php if ($detail['est_externe']): ?>
+                                                <?= number_format($detail['commission'], 0, '', ' ') ?> Ar
+                                                <span class="badge bg-warning text-dark ms-1">Externe</span>
+                                            <?php else: ?>
+                                                0 Ar
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="fw-bold text-info"><?= number_format($detail['montant'], 0, '', ' ') ?> Ar</td>
+                                    <?php else: ?>
+                                        <td class="fw-bold"><?= number_format($detail['montant'], 0, '', ' ') ?> Ar</td>
+                                        <td class="text-danger"><?= number_format($detail['frais'], 0, '', ' ') ?> Ar</td>
+                                        <td class="text-warning">
+                                            <?php if ($detail['est_externe']): ?>
+                                                <?= number_format($detail['commission'], 0, '', ' ') ?> Ar
+                                                <span class="badge bg-warning text-dark ms-1">Externe</span>
+                                            <?php else: ?>
+                                                0 Ar
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="fw-bold"><?= number_format($detail['total'], 0, '', ' ') ?> Ar</td>
+                                    <?php endif; ?>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                         <tfoot class="table-primary">
                             <tr>
-                                <th colspan="5" class="text-end">Total débité de votre compte</th>
-                                <th class="fw-bold fs-5"><?= number_format($total_debit, 0, '', ' ') ?> Ar</th>
+                                <?php if ($frais_inclus): ?>
+                                    <th colspan="4" class="text-end">Total débité de votre compte</th>
+                                    <th class="fw-bold fs-5"><?= number_format($total_debit, 0, '', ' ') ?> Ar</th>
+                                <?php else: ?>
+                                    <th colspan="5" class="text-end">Total débité de votre compte</th>
+                                    <th class="fw-bold fs-5"><?= number_format($total_debit, 0, '', ' ') ?> Ar</th>
+                                <?php endif; ?>
                             </tr>
                         </tfoot>
                     </table>
@@ -64,6 +96,9 @@
                                 <p class="mb-1"><strong>Nombre de destinataires :</strong> <?= count($details_envois) ?></p>
                                 <p class="mb-1"><strong>Total frais :</strong> <?= number_format($total_frais, 0, '', ' ') ?> Ar</p>
                                 <p class="mb-0"><strong>Total commission :</strong> <?= number_format($total_commission, 0, '', ' ') ?> Ar</p>
+                                <?php if ($frais_inclus && isset($total_montant_net)): ?>
+                                    <p class="mb-0"><strong>Total montant net envoyé :</strong> <?= number_format($total_montant_net, 0, '', ' ') ?> Ar</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -88,6 +123,7 @@
                         <?= csrf_field() ?>
                         <input type="hidden" name="mode_division" value="<?= esc($mode_division) ?>">
                         <input type="hidden" name="montant" value="<?= esc($montant_post) ?>">
+                        <input type="hidden" name="frais_inclus" value="<?= $frais_inclus ? '1' : '0' ?>">
                         <?php foreach ($destinataires_post as $dest): ?>
                             <input type="hidden" name="destinataires[]" value="<?= esc($dest) ?>">
                         <?php endforeach; ?>

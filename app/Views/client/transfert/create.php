@@ -6,9 +6,14 @@
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0"><i class="bi bi-arrow-left-right"></i> Effectuer un transfert</h4>
-                <a href="<?= base_url('client/dashboard') ?>" class="btn btn-sm btn-light">
-                    <i class="bi bi-arrow-left"></i> Retour
-                </a>
+                <div class="d-flex gap-2">
+                    <a href="<?= base_url('client/transfert/multiple') ?>" class="btn btn-sm btn-light">
+                        <i class="bi bi-people"></i> Transfert multiple
+                    </a>
+                    <a href="<?= base_url('client/dashboard') ?>" class="btn btn-sm btn-light">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                </div>
             </div>
             <div class="card-body p-4">
                 <form action="<?= base_url('client/transfert/preview') ?>" method="post" id="transfertForm">
@@ -36,6 +41,16 @@
                                    min="1" step="1" placeholder="Ex: 5000" required>
                             <span class="input-group-text">Ar</span>
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="frais_inclus" name="frais_inclus" value="1">
+                            <label class="form-check-label" for="frais_inclus">
+                                <i class="bi bi-info-circle"></i> Inclure les frais dans le montant
+                            </label>
+                        </div>
+                        <small class="text-muted">Si coché, le montant saisi est le total débité (frais + commission inclus). Sinon, les frais s'ajoutent au montant.</small>
                     </div>
 
                     <div class="d-grid">

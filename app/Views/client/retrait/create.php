@@ -23,8 +23,19 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="frais_inclus" name="frais_inclus" value="1">
+                            <label class="form-check-label" for="frais_inclus">
+                                <i class="bi bi-info-circle"></i> Inclure les frais dans le montant
+                            </label>
+                        </div>
+                        <small class="text-muted">Si coché, le montant saisi est le total débité (frais inclus). Sinon, les frais s'ajoutent au montant.</small>
+                    </div>
+
                     <div class="alert alert-secondary" id="fraisPreview" style="display:none;">
                         <i class="bi bi-calculator"></i> Frais estimés : <strong id="fraisEstime">-</strong> Ar &mdash;
+                        Montant net : <strong id="montantNetEstime">-</strong> Ar &mdash;
                         Total débité : <strong id="totalEstime">-</strong> Ar
                     </div>
 
@@ -47,24 +58,36 @@
 <script>
 // Fetch barème depuis l'API et afficher estimation de frais
 const input = document.getElementById('montant');
+const fraisInclusCheckbox = document.getElementById('frais_inclus');
 const preview = document.getElementById('fraisPreview');
 
-input.addEventListener('input', function() {
-    const montant = parseFloat(this.value);
-    if (!montant || montant <= 0) { preview.style.display = 'none'; return; }
+function updateFraisPreview() {
+    const montant = parseFloat(input.value);
+    const fraisInclus = fraisInclusCheckbox.checked;
+    
+    if (!montant || montant <= 0) { 
+        preview.style.display = 'none'; 
+        return; 
+    }
 
-    fetch('<?= base_url('client/retrait/frais') ?>?montant=' + montant)
+    const url = '<?= base_url('client/retrait/frais') ?>?montant=' + montant + '&frais_inclus=' + (fraisInclus ? '1' : '0');
+    
+    fetch(url)
         .then(r => r.json())
         .then(data => {
             if (data.frais !== undefined) {
                 document.getElementById('fraisEstime').textContent = new Intl.NumberFormat('fr-FR').format(data.frais);
-                document.getElementById('totalEstime').textContent  = new Intl.NumberFormat('fr-FR').format(montant + data.frais);
+                document.getElementById('montantNetEstime').textContent = new Intl.NumberFormat('fr-FR').format(data.montant_net);
+                document.getElementById('totalEstime').textContent = new Intl.NumberFormat('fr-FR').format(data.montant_total);
                 preview.style.display = 'block';
             } else {
                 preview.style.display = 'none';
             }
         })
         .catch(() => { preview.style.display = 'none'; });
-});
+}
+
+input.addEventListener('input', updateFraisPreview);
+fraisInclusCheckbox.addEventListener('change', updateFraisPreview);
 </script>
 <?= $this->endSection() ?>

@@ -32,6 +32,7 @@ class TransfertController extends BaseController
     {
         $montant      = $this->request->getPost('montant');
         $telephoneDest = trim($this->request->getPost('telephone_destinataire'));
+        $fraisInclus = $this->request->getPost('frais_inclus') === '1';
 
         if (empty($telephoneDest)) {
             return redirect()->back()->with('error', 'Le numéro destinataire est requis.');
@@ -56,23 +57,45 @@ class TransfertController extends BaseController
             return redirect()->back()->with('error', 'Aucun barème de frais disponible pour ce montant.');
         }
 
-        $frais      = $tranche['frais'];
-        $totalDebit = $montant + $frais;
+        $frais = $tranche['frais'];
+        
+        // Calculer la commission si externe
+        $prefixeModel = new PrefixeModel();
+        $prefixeDest = substr($telephoneDest, 0, 3);
+        $configPrefixe = $prefixeModel->where('prefixe', $prefixeDest)->first();
+        $commission = 0;
+        
+        if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+            $commission = ($montant * $configPrefixe['commission_pourcentage']) / 100;
+        }
+        
+        if ($fraisInclus) {
+            // Le montant saisi est le total débité (frais inclus)
+            $totalDebit = $montant;
+            $montantNet = $montant - $frais - $commission;
+        } else {
+            // Le montant saisi est le montant net, frais et commission s'ajoutent
+            $montantNet = $montant;
+            $totalDebit = $montant + $frais + $commission;
+        }
+        
         $emetteur   = $clientModel->find(session()->get('id'));
 
         if ($emetteur['solde'] < $totalDebit) {
             return redirect()->back()->with('error',
-                'Solde insuffisant. Il vous faut ' . number_format($totalDebit, 0, '', ' ') . ' Ar (montant + frais ' . number_format($frais, 0, '', ' ') . ' Ar), mais votre solde est de ' . number_format($emetteur['solde'], 0, '', ' ') . ' Ar.');
+                'Solde insuffisant. Il vous faut ' . number_format($totalDebit, 0, '', ' ') . ' Ar (montant + frais ' . number_format($frais, 0, '', ' ') . ' Ar + commission ' . number_format($commission, 0, '', ' ') . ' Ar), mais votre solde est de ' . number_format($emetteur['solde'], 0, '', ' ') . ' Ar.');
         }
 
         return view('client/transfert/confirm', [
-            'montant'                => $montant,
+            'montant'                => $montantNet,
             'frais'                  => $frais,
+            'commission'             => $commission,
             'total_debit'            => $totalDebit,
             'solde_actuel'           => $emetteur['solde'],
             'nouveau_solde'          => $emetteur['solde'] - $totalDebit,
             'telephone_destinataire' => $telephoneDest,
             'nom_destinataire'       => $destinataire['nom_clients'],
+            'frais_inclus'           => $fraisInclus,
         ]);
     }
 
@@ -80,6 +103,7 @@ class TransfertController extends BaseController
     {
         $montant      = $this->request->getPost('montant');
         $telephoneDest = trim($this->request->getPost('telephone_destinataire'));
+        $fraisInclus = $this->request->getPost('frais_inclus') === '1';
 
         if (empty($telephoneDest) || empty($montant) || !is_numeric($montant) || (float)$montant <= 0) {
             return redirect()->to(base_url('client/transfert'))->with('error', 'Données invalides.');
@@ -101,8 +125,26 @@ class TransfertController extends BaseController
             return redirect()->to(base_url('client/transfert'))->with('error', 'Aucun barème de frais disponible pour ce montant.');
         }
 
-        $frais            = $tranche['frais'];
-        $totalDebit       = $montant + $frais;
+        $frais = $tranche['frais'];
+        
+        // Calculer la commission si externe
+        $prefixeModel = new PrefixeModel();
+        $prefixeDest = substr($telephoneDest, 0, 3);
+        $configPrefixe = $prefixeModel->where('prefixe', $prefixeDest)->first();
+        $commission = 0;
+        
+        if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+            $commission = ($montant * $configPrefixe['commission_pourcentage']) / 100;
+        }
+        
+        if ($fraisInclus) {
+            $totalDebit = $montant;
+            $montantNet = $montant - $frais - $commission;
+        } else {
+            $montantNet = $montant;
+            $totalDebit = $montant + $frais + $commission;
+        }
+        
         $emetteurId       = session()->get('id');
         $telephoneEmetteur = session()->get('telephone');
         $db               = \Config\Database::connect();
@@ -121,7 +163,7 @@ class TransfertController extends BaseController
             // Débiter l'émetteur
             $clientModel->update($emetteurId, ['solde' => $nouveauSolde]);
             // Créditer le destinataire
-            $clientModel->update($destinataire['id'], ['solde' => $destinataire['solde'] + $montant]);
+            $clientModel->update($destinataire['id'], ['solde' => $destinataire['solde'] + $montantNet]);
 
             $txModel = new TransactionModel();
             // Ligne émetteur
@@ -129,16 +171,20 @@ class TransfertController extends BaseController
                 'telephone_client'       => $telephoneEmetteur,
                 'telephone_destinataire' => $telephoneDest,
                 'type_operation'         => 'transfert_envoi',
-                'montant'                => $montant,
+                'montant'                => $montantNet,
                 'frais'                  => $frais,
+                'commission'             => $commission,
+                'frais_inclus'           => $fraisInclus ? 1 : 0,
             ]);
             // Ligne destinataire
             $txModel->insert([
                 'telephone_client'       => $telephoneDest,
                 'telephone_destinataire' => $telephoneEmetteur,
                 'type_operation'         => 'transfert_reception',
-                'montant'                => $montant,
+                'montant'                => $montantNet,
                 'frais'                  => 0.0,
+                'commission'             => 0.0,
+                'frais_inclus'           => $fraisInclus ? 1 : 0,
             ]);
 
             $db->transCommit();
@@ -148,7 +194,7 @@ class TransfertController extends BaseController
         }
 
         return redirect()->to(base_url('client/dashboard'))
-            ->with('success', 'Transfert de ' . number_format($montant, 0, '', ' ') . ' Ar envoyé à ' . esc($telephoneDest) . '. Frais : ' . number_format($frais, 0, '', ' ') . ' Ar.');
+            ->with('success', 'Transfert de ' . number_format($montantNet, 0, '', ' ') . ' Ar envoyé à ' . esc($telephoneDest) . '. Frais : ' . number_format($frais, 0, '', ' ') . ' Ar. Commission : ' . number_format($commission, 0, '', ' ') . ' Ar. Total débité : ' . number_format($totalDebit, 0, '', ' ') . ' Ar.');
     }
 
     public function createMultiple()
@@ -161,6 +207,7 @@ class TransfertController extends BaseController
         $modeDivision = $this->request->getPost('mode_division'); // 'total' ou 'par_destinataire'
         $destinataires = $this->request->getPost('destinataires'); // array of phone numbers
         $montant = $this->request->getPost('montant');
+        $fraisInclus = $this->request->getPost('frais_inclus') === '1';
 
         if (empty($destinataires) || !is_array($destinataires)) {
             return redirect()->back()->with('error', 'Veuillez ajouter au moins un destinataire.');
@@ -189,6 +236,7 @@ class TransfertController extends BaseController
         $totalDebit = 0;
         $totalFrais = 0;
         $totalCommission = 0;
+        $totalMontantNet = 0;
 
         foreach ($destinataires as $telephoneDest) {
             // Vérifier que le destinataire n'est pas l'émetteur
@@ -241,12 +289,20 @@ class TransfertController extends BaseController
                 $commission = ($montantFinal * $configPrefixe['commission_pourcentage']) / 100;
             }
 
-            $totalPourDestinataire = $montantFinal + $frais + $commission;
+            if ($fraisInclus) {
+                // Le montant saisi est le total débité (frais inclus)
+                $totalPourDestinataire = $montantFinal;
+                $montantNetDestinataire = $montantFinal - $frais - $commission;
+            } else {
+                // Le montant saisi est le montant net, frais et commission s'ajoutent
+                $montantNetDestinataire = $montantFinal;
+                $totalPourDestinataire = $montantFinal + $frais + $commission;
+            }
 
             $detailsEnvois[] = [
                 'telephone' => $telephoneDest,
                 'nom' => $destinataire['nom_clients'],
-                'montant' => $montantFinal,
+                'montant' => $montantNetDestinataire,
                 'frais' => $frais,
                 'commission' => $commission,
                 'est_externe' => $estExterne,
@@ -256,6 +312,7 @@ class TransfertController extends BaseController
             $totalDebit += $totalPourDestinataire;
             $totalFrais += $frais;
             $totalCommission += $commission;
+            $totalMontantNet += $montantNetDestinataire;
         }
 
         // Vérifier le solde
@@ -270,10 +327,12 @@ class TransfertController extends BaseController
             'total_debit' => $totalDebit,
             'total_frais' => $totalFrais,
             'total_commission' => $totalCommission,
+            'total_montant_net' => $totalMontantNet,
             'solde_actuel' => $emetteur['solde'],
             'nouveau_solde' => $emetteur['solde'] - $totalDebit,
             'destinataires_post' => $destinataires,
-            'montant_post' => $montant
+            'montant_post' => $montant,
+            'frais_inclus' => $fraisInclus
         ]);
     }
 
@@ -282,6 +341,7 @@ class TransfertController extends BaseController
         $modeDivision = $this->request->getPost('mode_division');
         $destinataires = $this->request->getPost('destinataires');
         $montant = $this->request->getPost('montant');
+        $fraisInclus = $this->request->getPost('frais_inclus') === '1';
 
         if (empty($destinataires) || !is_array($destinataires)) {
             return redirect()->to(base_url('client/transfert/multiple'))->with('error', 'Données invalides.');
@@ -365,13 +425,20 @@ class TransfertController extends BaseController
                     $commission = ($montantFinal * $configPrefixe['commission_pourcentage']) / 100;
                 }
 
-                $totalPourDestinataire = $montantFinal + $frais + $commission;
+                if ($fraisInclus) {
+                    $totalPourDestinataire = $montantFinal;
+                    $montantNetDestinataire = $montantFinal - $frais - $commission;
+                } else {
+                    $montantNetDestinataire = $montantFinal;
+                    $totalPourDestinataire = $montantFinal + $frais + $commission;
+                }
+                
                 $totalDebit += $totalPourDestinataire;
 
                 $detailsEnvois[] = [
                     'telephone' => $telephoneDest,
                     'destinataire' => $destinataire,
-                    'montant' => $montantFinal,
+                    'montant' => $montantNetDestinataire,
                     'frais' => $frais,
                     'commission' => $commission
                 ];
@@ -398,7 +465,7 @@ class TransfertController extends BaseController
                     'montant' => $detail['montant'],
                     'frais' => $detail['frais'],
                     'commission' => $detail['commission'],
-                    'frais_inclus' => 0,
+                    'frais_inclus' => $fraisInclus ? 1 : 0,
                     'groupe_envoi' => $groupeEnvoi
                 ]);
 
@@ -410,7 +477,7 @@ class TransfertController extends BaseController
                     'montant' => $detail['montant'],
                     'frais' => 0.0,
                     'commission' => 0.0,
-                    'frais_inclus' => 0,
+                    'frais_inclus' => $fraisInclus ? 1 : 0,
                     'groupe_envoi' => $groupeEnvoi
                 ]);
             }

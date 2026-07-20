@@ -41,6 +41,16 @@
                         </small>
                     </div>
 
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="frais_inclus" name="frais_inclus" value="1">
+                            <label class="form-check-label" for="frais_inclus">
+                                <i class="bi bi-info-circle"></i> Inclure les frais dans le montant
+                            </label>
+                        </div>
+                        <small class="text-muted">Si coché, le montant saisi est le total débité (frais + commission inclus). Sinon, les frais s'ajoutent au montant.</small>
+                    </div>
+
                     <div class="mb-4">
                         <label class="form-label fw-semibold">Destinataires</label>
                         <div id="destinataires_container">
