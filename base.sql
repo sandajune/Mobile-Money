@@ -119,3 +119,20 @@ INSERT INTO operateurs (username, password, nom) VALUES ('admin', 'admin123', 'A
 
 
 
+-- Version 2
+
+-- =====================================================================
+-- PASSAGE À LA VERSION 2 (MIGRATION VIA ALTER TABLE)
+-- =====================================================================
+
+-- 1. Modifications de la table 'config_prefixes'
+ALTER TABLE config_prefixes ADD COLUMN type_operateur TEXT NOT NULL DEFAULT 'externe';
+ALTER TABLE config_prefixes ADD COLUMN commission_pourcentage REAL DEFAULT 0; 
+
+-- 2. Modifications de la table 'transactions'
+ALTER TABLE transactions ADD COLUMN frais_inclus INTEGER NOT NULL DEFAULT 0; 
+ALTER TABLE transactions ADD COLUMN groupe_envoi TEXT DEFAULT NULL; 
+ALTER TABLE transactions ADD COLUMN commission REAL NOT NULL DEFAULT 0; 
+
+-- 3. Insertion des nouvelles données de la Version 2
+INSERT INTO config_prefixes (nom_operateur, prefixe, type_operateur) VALUES ('M-Money', '035', 'interne');
