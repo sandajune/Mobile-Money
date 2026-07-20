@@ -14,7 +14,7 @@
                         <label class="form-label">Numéro de téléphone</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-phone"></i></span>
-                            <input type="text" name="telephone" id="telephone" class="form-control" placeholder="Ex: 0331234567" required>
+                            <input type="text" name="telephone" id="telephone" class="form-control" placeholder="Ex: 032 12 345 67" maxlength="13" data-phone-input required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Accéder au service</button>
@@ -29,8 +29,8 @@
 
 <script>
 document.getElementById('loginForm').addEventListener('submit', function(e) {
-    const tel = document.getElementById('telephone').value;
-    if(isNaN(tel) || tel.length < 3) {
+    const tel = window.PhoneFormatter.clean(document.getElementById('telephone').value);
+    if (!/^\d{10}$/.test(tel)) {
         alert("Veuillez saisir un numéro de téléphone valide composé uniquement de chiffres.");
         e.preventDefault();
     }

@@ -4,7 +4,7 @@
 <div class="page-header">
     <div>
         <h1 class="h3 mb-0">Bienvenue, <?= esc($client['nom_clients']) ?></h1>
-        <p class="page-subtitle">Numéro de compte : <?= esc($client['telephone']) ?></p>
+        <p class="page-subtitle">Numéro de compte : <span data-phone-display><?= esc($client['telephone']) ?></span></p>
     </div>
 </div>
 

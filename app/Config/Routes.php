@@ -35,6 +35,11 @@ $routes->group('client', ['filter' => 'clientAuth'], function($routes) {
     $routes->post('transfert/check', 'Client\TransfertController::checkDestinataire');  // AJAX
     $routes->post('transfert/preview', 'Client\TransfertController::preview');
     $routes->post('transfert/store', 'Client\TransfertController::store');
+    
+    // Envoi multiple
+    $routes->get('transfert/multiple', 'Client\TransfertController::createMultiple');
+    $routes->post('transfert/previewMultiple', 'Client\TransfertController::previewMultiple');
+    $routes->post('transfert/storeMultiple', 'Client\TransfertController::storeMultiple');
 });
 
 // Espace Opérateur - Authentification
@@ -55,6 +60,7 @@ $routes->group('operateur', function($routes) {
         $routes->get('prefixes/edit/(:num)', 'Operateur\PrefixeController::edit/$1');
         $routes->post('prefixes/update/(:num)', 'Operateur\PrefixeController::update/$1');
         $routes->get('prefixes/delete/(:num)', 'Operateur\PrefixeController::delete/$1');
+        $routes->get('prefixes/externes', 'Operateur\PrefixeController::getExternes');  // AJAX
 
         // Barèmes & Tarifs (modification)
         $routes->get('frais', 'Operateur\TypeOperationController::index');

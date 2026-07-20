@@ -20,6 +20,7 @@
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="text" name="search" class="form-control"
+                           data-phone-input maxlength="13"
                            placeholder="Ex: 033..." value="<?= esc($search ?? '') ?>">
                 </div>
             </div>
@@ -58,7 +59,7 @@
                         <?php foreach ($clients as $c): ?>
                         <tr>
                             <td><?= esc($c['nom_clients']) ?></td>
-                            <td><code><?= esc($c['telephone']) ?></code></td>
+                            <td><code data-phone-display><?= esc($c['telephone']) ?></code></td>
                             <td class="text-end fw-bold <?= $c['solde'] > 0 ? 'text-success' : 'text-muted' ?>">
                                 <?= number_format($c['solde'], 0, '', ' ') ?> Ar
                             </td>

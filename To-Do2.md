@@ -11,17 +11,17 @@
  
 - [ ] **`config_prefixes`** : ajouter une notion "interne / externe"
 ```sql
-  ALTER TABLE config_prefixes ADD COLUMN type_operateur TEXT NOT NULL DEFAULT 'interne'; -- 'interne' ou 'externe'
-  ALTER TABLE config_prefixes ADD COLUMN commission_pourcentage REAL DEFAULT 0; -- uniquement rempli si type_operateur = 'externe'
+  ALTER TABLE config_prefixes ADD COLUMN type_operateur TEXT NOT NULL DEFAULT 'interne';
+  ALTER TABLE config_prefixes ADD COLUMN commission_pourcentage REAL DEFAULT 0; 
 ```
   - [ ] Décider qui est "interne" (notre opérateur, ex: le préfixe utilisé par les clients de la plateforme) vs "externe" (Orange, Airtel, Yas... vers qui on peut transférer avec commission)
   - [ ] Mettre à jour les données de test dans `base.sql` en conséquence (ex: `033`/`037` = interne, `032`/`031`/`038` = externe)
   - [ ] Ajouter une contrainte logique : `commission_pourcentage` obligatoire (>0) si `type_operateur = 'externe'`, forcé à 0 si `interne` (à valider côté back, SQLite ne gère pas bien les CHECK conditionnels après coup)
 - [ ] **`transactions`** : ajouter le nécessaire pour frais inclus + envoi multiple
 ```sql
-  ALTER TABLE transactions ADD COLUMN frais_inclus INTEGER NOT NULL DEFAULT 0; -- 0 = frais en plus, 1 = frais inclus dans le montant
-  ALTER TABLE transactions ADD COLUMN groupe_envoi TEXT DEFAULT NULL; -- identifiant commun (UUID) pour lier les lignes d'un envoi multiple
-  ALTER TABLE transactions ADD COLUMN commission REAL NOT NULL DEFAULT 0; -- commission opérateur externe (distincte des frais internes)
+  ALTER TABLE transactions ADD COLUMN frais_inclus INTEGER NOT NULL DEFAULT 0; 
+  ALTER TABLE transactions ADD COLUMN groupe_envoi TEXT DEFAULT NULL; 
+  ALTER TABLE transactions ADD COLUMN commission REAL NOT NULL DEFAULT 0; 
 ```
   - [ ] ⚠️ Attention : SQLite ne permet pas de modifier un `CHECK` existant avec un simple `ALTER TABLE`. Si on doit élargir `type_operation` (ex: ajouter `'transfert_externe'`), il faudra soit s'en passer (garder `transfert_envoi`/`transfert_reception` et distinguer via `config_prefixes`), soit recréer la table (`CREATE TABLE ... RENAME`, copier les données, `DROP`/`RENAME`). **Décider ensemble de l'approche avant de coder.**
   - [ ] Mettre à jour les migrations CodeIgniter correspondantes (nouvelle migration `V2_AlterTables` plutôt que modifier la migration V1 déjà livrée)

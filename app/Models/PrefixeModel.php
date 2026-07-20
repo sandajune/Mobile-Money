@@ -5,5 +5,5 @@ use CodeIgniter\Model;
 class PrefixeModel extends Model {
     protected $table = 'config_prefixes';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['nom_operateur', 'prefixe'];
+    protected $allowedFields = ['nom_operateur', 'prefixe', 'type_operateur', 'commission_pourcentage'];
 }

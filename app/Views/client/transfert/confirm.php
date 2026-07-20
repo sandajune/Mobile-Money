@@ -17,7 +17,7 @@
                         <th class="table-light">Destinataire</th>
                         <td>
                             <strong><?= esc($nom_destinataire) ?></strong><br>
-                            <span class="text-muted"><?= esc($telephone_destinataire) ?></span>
+                            <span class="text-muted" data-phone-display><?= esc($telephone_destinataire) ?></span>
                         </td>
                     </tr>
                     <tr>

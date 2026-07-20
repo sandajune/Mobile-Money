@@ -19,8 +19,8 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-phone"></i></span>
                             <input type="text" class="form-control" id="telephone_destinataire"
-                                   name="telephone_destinataire" placeholder="Ex: 0331234567"
-                                   maxlength="10" required autofocus>
+                                   name="telephone_destinataire" placeholder="Ex: 032 12 345 67"
+                                   maxlength="13" data-phone-input required autofocus>
                             <button type="button" class="btn btn-outline-secondary" id="checkBtn">
                                 <i class="bi bi-search"></i> Vérifier
                             </button>
@@ -56,7 +56,7 @@
 
 <script>
 document.getElementById('checkBtn').addEventListener('click', function() {
-    const tel = document.getElementById('telephone_destinataire').value.trim();
+    const tel = window.PhoneFormatter.clean(document.getElementById('telephone_destinataire').value.trim());
     const feedback = document.getElementById('destFeedback');
 
     if (!tel) {
@@ -82,6 +82,12 @@ document.getElementById('checkBtn').addEventListener('click', function() {
         .catch(() => {
             feedback.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-circle"></i> Impossible de vérifier le numéro.</span>';
         });
+});
+
+// Nettoyer le numéro avant soumission
+document.getElementById('transfertForm').addEventListener('submit', function(e) {
+    const telInput = document.getElementById('telephone_destinataire');
+    telInput.value = window.PhoneFormatter.clean(telInput.value);
 });
 </script>
 <?= $this->endSection() ?>

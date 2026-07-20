@@ -25,6 +25,21 @@
                     <small class="text-muted">Ex: 032, 033, 038</small>
                 </div>
                 <div class="mb-3">
+                    <label for="type_operateur" class="form-label">Type d'opérateur</label>
+                    <select class="form-select" id="type_operateur" name="type_operateur" required onchange="toggleCommissionField()">
+                        <option value="" disabled>Choisir le type...</option>
+                        <option value="interne" <?= $prefixe['type_operateur'] === 'interne' ? 'selected' : '' ?>>Interne</option>
+                        <option value="externe" <?= $prefixe['type_operateur'] === 'externe' ? 'selected' : '' ?>>Externe</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="commission_field" style="display: <?= $prefixe['type_operateur'] === 'externe' ? 'block' : 'none' ?>;">
+                    <label for="commission_pourcentage" class="form-label">% Commission</label>
+                    <input type="number" class="form-control" id="commission_pourcentage" name="commission_pourcentage"
+                           value="<?= $prefixe['type_operateur'] === 'externe' ? number_format($prefixe['commission_pourcentage'], 2) : '' ?>"
+                           min="0" max="100" step="0.01" <?= $prefixe['type_operateur'] === 'externe' ? 'required' : '' ?>>
+                    <small class="text-muted">Pourcentage de commission pour les transferts vers cet opérateur externe (0-100)</small>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Date de création</label>
                     <input type="text" class="form-control" value="<?= date('d/m/Y H:i', strtotime($prefixe['date_creation'])) ?>" disabled>
                 </div>
@@ -35,4 +50,20 @@
             </form>
         </div>
     </div>
+
+<script>
+function toggleCommissionField() {
+    const typeOperateur = document.getElementById('type_operateur').value;
+    const commissionField = document.getElementById('commission_field');
+    const commissionInput = document.getElementById('commission_pourcentage');
+    if (typeOperateur === 'externe') {
+        commissionField.style.display = 'block';
+        commissionInput.required = true;
+    } else {
+        commissionField.style.display = 'none';
+        commissionInput.required = false;
+        commissionInput.value = '';
+    }
+}
+</script>
 <?= $this->endSection() ?>

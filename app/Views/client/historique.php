@@ -48,11 +48,11 @@
                         <td>
                             <?php if($tx['telephone_destinataire']): ?>
                                 <?php if($tx['type_operation'] == 'transfert_envoi'): ?>
-                                    <span class="text-muted">Vers : </span><strong><?= esc($tx['telephone_destinataire']) ?></strong>
+                                    <span class="text-muted">Vers : </span><strong data-phone-display><?= esc($tx['telephone_destinataire']) ?></strong>
                                 <?php elseif($tx['type_operation'] == 'transfert_reception'): ?>
-                                    <span class="text-muted">De : </span><strong><?= esc($tx['telephone_destinataire']) ?></strong>
+                                    <span class="text-muted">De : </span><strong data-phone-display><?= esc($tx['telephone_destinataire']) ?></strong>
                                 <?php else: ?>
-                                    <span class="text-muted">Dest : </span><?= esc($tx['telephone_destinataire']) ?>
+                                    <span class="text-muted">Dest : </span><span data-phone-display><?= esc($tx['telephone_destinataire']) ?></span>
                                 <?php endif; ?>
                             <?php else: ?>
                                 <span class="text-muted">&mdash;</span>

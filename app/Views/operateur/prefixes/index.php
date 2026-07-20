@@ -20,6 +20,8 @@
                         <th>ID</th>
                         <th>Opérateur</th>
                         <th>Préfixe</th>
+                        <th>Type d'opérateur</th>
+                        <th>% Commission</th>
                         <th>Date de création</th>
                         <th>Actions</th>
                     </tr>
@@ -31,6 +33,20 @@
                                 <td><?= $prefixe['id'] ?></td>
                                 <td><?= esc($prefixe['nom_operateur']) ?></td>
                                 <td><span class="badge bg-primary"><?= esc($prefixe['prefixe']) ?></span></td>
+                                <td>
+                                    <?php if ($prefixe['type_operateur'] === 'interne'): ?>
+                                        <span class="badge bg-success">Interne</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-warning text-dark">Externe</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($prefixe['type_operateur'] === 'externe'): ?>
+                                        <span class="badge bg-info"><?= number_format($prefixe['commission_pourcentage'], 2) ?>%</span>
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= date('d/m/Y H:i', strtotime($prefixe['date_creation'])) ?></td>
                                 <td>
                                     <a href="<?= base_url('operateur/prefixes/edit/' . $prefixe['id']) ?>"
@@ -47,7 +63,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">
+                            <td colspan="7" class="text-center text-muted py-4">
                                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                 Aucun préfixe configuré.
                             </td>
@@ -84,6 +100,20 @@
                                pattern="[0-9]{3}" maxlength="3" required>
                         <small class="text-muted">Ex: 032, 033, 038</small>
                     </div>
+                    <div class="mb-3">
+                        <label for="type_operateur" class="form-label">Type d'opérateur</label>
+                        <select class="form-select" id="type_operateur" name="type_operateur" required onchange="toggleCommissionField()">
+                            <option value="" selected disabled>Choisir le type...</option>
+                            <option value="interne">Interne</option>
+                            <option value="externe">Externe</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="commission_field" style="display: none;">
+                        <label for="commission_pourcentage" class="form-label">% Commission</label>
+                        <input type="number" class="form-control" id="commission_pourcentage" name="commission_pourcentage"
+                               min="0" max="100" step="0.01">
+                        <small class="text-muted">Pourcentage de commission pour les transferts vers cet opérateur externe (0-100)</small>
+                    </div>
                     <div class="modal-footer px-0 pb-0">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
                         <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -93,4 +123,19 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleCommissionField() {
+    const typeOperateur = document.getElementById('type_operateur').value;
+    const commissionField = document.getElementById('commission_field');
+    if (typeOperateur === 'externe') {
+        commissionField.style.display = 'block';
+        document.getElementById('commission_pourcentage').required = true;
+    } else {
+        commissionField.style.display = 'none';
+        document.getElementById('commission_pourcentage').required = false;
+        document.getElementById('commission_pourcentage').value = '';
+    }
+}
+</script>
 <?= $this->endSection() ?>

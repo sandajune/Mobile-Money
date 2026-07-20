@@ -43,7 +43,7 @@
                 </ul>
                 <div class="navbar-nav ms-auto align-items-lg-center">
                     <span class="navbar-user me-2">
-                        <i class="bi bi-person-circle"></i> <?= esc(session()->get('telephone')) ?>
+                        <i class="bi bi-person-circle"></i> <span data-phone-display><?= esc(session()->get('telephone')) ?></span>
                     </span>
                     <a class="btn btn-sm btn-logout" href="<?= base_url('logout') ?>">
                         <i class="bi bi-box-arrow-right"></i> Déconnexion
@@ -142,5 +142,6 @@
     </footer>
 
     <script src="<?= base_url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/phone.js') ?>"></script>
 </body>
 </html>
