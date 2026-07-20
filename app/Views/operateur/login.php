@@ -14,14 +14,14 @@
                         <label for="username" class="form-label">Nom d'utilisateur</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="admin"required>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Mot de passe</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-key"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="admin123"required>
                         </div>
                     </div>
                     <div class="d-grid">
