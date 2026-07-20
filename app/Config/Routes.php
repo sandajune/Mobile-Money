@@ -18,6 +18,23 @@ $routes->group('client', ['filter' => 'clientAuth'], function($routes) {
     $routes->get('historique', 'Client\CompteController::historique');
     // Lecture seule des tarifs pour les clients
     $routes->get('tarifs', 'Client\TarifsController::index');
+
+    // Dépôt
+    $routes->get('depot', 'Client\DepotController::create');
+    $routes->post('depot/preview', 'Client\DepotController::preview');
+    $routes->post('depot/store', 'Client\DepotController::store');
+
+    // Retrait
+    $routes->get('retrait', 'Client\RetraitController::create');
+    $routes->get('retrait/frais', 'Client\RetraitController::frais');  // AJAX fee lookup
+    $routes->post('retrait/preview', 'Client\RetraitController::preview');
+    $routes->post('retrait/store', 'Client\RetraitController::store');
+
+    // Transfert
+    $routes->get('transfert', 'Client\TransfertController::create');
+    $routes->post('transfert/check', 'Client\TransfertController::checkDestinataire');  // AJAX
+    $routes->post('transfert/preview', 'Client\TransfertController::preview');
+    $routes->post('transfert/store', 'Client\TransfertController::store');
 });
 
 // Espace Opérateur - Authentification
@@ -28,6 +45,10 @@ $routes->group('operateur', function($routes) {
     
     // Routes protégées (modification)
     $routes->group('', ['filter' => 'operateurAuth'], function($routes) {
+        // Reporting
+        $routes->get('reporting/gains', 'Operateur\ReportingController::gains');
+        $routes->get('reporting/clients', 'Operateur\ReportingController::clients');
+
         // Préfixes
         $routes->get('prefixes', 'Operateur\PrefixeController::index');
         $routes->post('prefixes/store', 'Operateur\PrefixeController::store');

@@ -27,15 +27,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="<?= base_url('client/tarifs') ?>"><i class="bi bi-currency-dollar"></i> Tarifs</a>
                     </li>
-                    <!-- Boutons vides pour Tsiory -->
                     <li class="nav-item">
-                        <button class="nav-link btn btn-link text-white" disabled><i class="bi bi-cash-coin"></i> Dépôt (Tsiory)</button>
+                        <a class="nav-link" href="<?= base_url('client/depot') ?>"><i class="bi bi-cash-coin"></i> Dépôt</a>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link btn btn-link text-white" disabled><i class="bi bi-cash-stack"></i> Retrait (Tsiory)</button>
+                        <a class="nav-link" href="<?= base_url('client/retrait') ?>"><i class="bi bi-cash-stack"></i> Retrait</a>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link btn btn-link text-white" disabled><i class="bi bi-arrow-left-right"></i> Transfert (Tsiory)</button>
+                        <a class="nav-link" href="<?= base_url('client/transfert') ?>"><i class="bi bi-arrow-left-right"></i> Transfert</a>
                     </li>
                 </ul>
                 <div class="navbar-nav ms-auto">
@@ -64,6 +63,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= base_url('operateur/frais') ?>"><i class="bi bi-currency-dollar"></i> Barèmes de frais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('operateur/reporting/gains') ?>"><i class="bi bi-graph-up-arrow"></i> Gains</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('operateur/reporting/clients') ?>"><i class="bi bi-people"></i> Comptes clients</a>
                     </li>
                 </ul>
                 <div class="navbar-nav ms-auto">
