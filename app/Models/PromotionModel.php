@@ -15,18 +15,31 @@ class PromotionModel extends Model {
     }
 
     /**
-     * Applique la promotion active à un montant de frais.
+     * Calcule le montant de la promotion (pourcentage des frais).
      */
-    public function applyPromotion(float $frais): float {
+    public function calculerMontantPromotion(float $frais): float {
         $promotion = $this->getActivePromotion();
         
         if ($promotion === null) {
-            return $frais;
+            return 0.0;
         }
 
-        $reduction = $frais * ($promotion['pourcentage'] / 100);
-        $nouveauxFrais = max(0, $frais - $reduction);
+        return $frais * ($promotion['pourcentage'] / 100);
+    }
+
+    /**
+     * Applique la promotion en créditant le montant sur l'épargne du client.
+     * Retourne les frais inchangés (la promotion va en épargne).
+     */
+    public function applyPromotion(float $frais, string $telephoneClient): float {
+        $montantPromotion = $this->calculerMontantPromotion($frais);
         
-        return $nouveauxFrais;
+        if ($montantPromotion > 0) {
+            $epargneModel = new EpargneModel();
+            $epargneModel->createIfNotExists($telephoneClient);
+            $epargneModel->ajouterEpargne($telephoneClient, $montantPromotion);
+        }
+        
+        return $frais;
     }
 }

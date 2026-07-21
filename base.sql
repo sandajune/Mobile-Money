@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS config_prefixes;
 DROP TABLE IF EXISTS clients;
 DROP TABLE IF EXISTS operateurs;
 DROP TABLE IF EXISTS promotions;
+DROP TABLE IF EXISTS epargne;
 
 PRAGMA foreign_keys = ON;
 
@@ -58,6 +59,18 @@ CREATE TABLE promotions (
     est_actif INTEGER NOT NULL DEFAULT 1, -- 1 = active, 0 = inactive
     CHECK (pourcentage >= 0 AND pourcentage <= 100),
     CHECK (est_actif IN (0, 1))
+);
+
+-- =====================================================================
+-- 2.2 TABLE : ÉPARGNE CLIENT
+-- =====================================================================
+CREATE TABLE epargne (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    telephone_client TEXT NOT NULL,        -- Numéro de téléphone du client
+    solde_epargne REAL NOT NULL DEFAULT 0.0, -- Solde d'épargne du client
+    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_mise_a_jour DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (telephone_client) REFERENCES clients(telephone)
 );
 
 -- =====================================================================

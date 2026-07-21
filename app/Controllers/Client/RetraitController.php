@@ -37,9 +37,9 @@ class RetraitController extends BaseController
             if ($tranche) {
                 $frais = $tranche['frais'];
 
-                // Appliquer la promotion si active
+                // Appliquer la promotion si active (crédite l'épargne)
                 $promotionModel = new PromotionModel();
-                $frais = $promotionModel->applyPromotion($frais);
+                $frais = $promotionModel->applyPromotion($frais, $telephone);
             }
         }
         
@@ -89,9 +89,9 @@ class RetraitController extends BaseController
             if ($tranche) {
                 $frais = $tranche['frais'];
 
-                // Appliquer la promotion si active
+                // Appliquer la promotion si active (crédite l'épargne)
                 $promotionModel = new PromotionModel();
-                $frais = $promotionModel->applyPromotion($frais);
+                $frais = $promotionModel->applyPromotion($frais, $telephone);
             }
         }
         
@@ -146,9 +146,9 @@ class RetraitController extends BaseController
             if ($tranche) {
                 $frais = $tranche['frais'];
 
-                // Appliquer la promotion si active
+                // Appliquer la promotion si active (crédite l'épargne)
                 $promotionModel = new PromotionModel();
-                $frais = $promotionModel->applyPromotion($frais);
+                $frais = $promotionModel->applyPromotion($frais, $telephone);
             }
         }
         
