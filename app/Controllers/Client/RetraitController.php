@@ -5,6 +5,7 @@ use App\Controllers\BaseController;
 use App\Models\BaremeFraisModel;
 use App\Models\ClientModel;
 use App\Models\TransactionModel;
+use App\Models\PromotionModel;
 
 class RetraitController extends BaseController
 {
@@ -35,11 +36,14 @@ class RetraitController extends BaseController
             $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
             if ($tranche) {
                 $frais = $tranche['frais'];
+
+                // Appliquer la promotion si active
+                $promotionModel = new PromotionModel();
+                $frais = $promotionModel->applyPromotion($frais);
             }
         }
         
         // Si frais inclus, le montant saisi est le montant total débité
-        // Il faut trouver la tranche basée sur le montant net (montant - frais)
         if ($fraisInclus) {
             $montantNet = $montant - $frais;
             
@@ -50,7 +54,6 @@ class RetraitController extends BaseController
                 'frais_inclus' => true
             ]);
         } else {
-            // Comportement normal: frais s'ajoutent au montant
             $montantTotal = $montant + $frais;
             
             return $this->response->setJSON([
@@ -85,6 +88,10 @@ class RetraitController extends BaseController
             $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
             if ($tranche) {
                 $frais = $tranche['frais'];
+
+                // Appliquer la promotion si active
+                $promotionModel = new PromotionModel();
+                $frais = $promotionModel->applyPromotion($frais);
             }
         }
         
@@ -138,6 +145,10 @@ class RetraitController extends BaseController
             $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
             if ($tranche) {
                 $frais = $tranche['frais'];
+
+                // Appliquer la promotion si active
+                $promotionModel = new PromotionModel();
+                $frais = $promotionModel->applyPromotion($frais);
             }
         }
         

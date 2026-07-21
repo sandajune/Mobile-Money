@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS bareme_frais;
 DROP TABLE IF EXISTS config_prefixes;
 DROP TABLE IF EXISTS clients;
 DROP TABLE IF EXISTS operateurs;
+DROP TABLE IF EXISTS promotions;
 
 PRAGMA foreign_keys = ON;
 
@@ -46,6 +47,17 @@ CREATE TABLE bareme_frais (
     frais REAL NOT NULL,                   -- Montant fixe des frais pour cette tranche
     CHECK (type_operation IN ('retrait', 'transfert')),
     CHECK (montant_max >= montant_min)
+);
+
+-- =====================================================================
+-- 2.1 TABLE : PROMOTIONS (RÉDUCTIONS SUR FRAIS)
+-- =====================================================================
+CREATE TABLE promotions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pourcentage REAL NOT NULL,             -- Pourcentage de réduction (0-100)
+    est_actif INTEGER NOT NULL DEFAULT 1, -- 1 = active, 0 = inactive
+    CHECK (pourcentage >= 0 AND pourcentage <= 100),
+    CHECK (est_actif IN (0, 1))
 );
 
 -- =====================================================================
