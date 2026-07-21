@@ -23,19 +23,24 @@ class RetraitController extends BaseController
             return $this->response->setJSON(['frais' => null, 'error' => 'Montant invalide']);
         }
         
+        // Vérifier si le client est sur un réseau interne ou externe
+        $telephone = session()->get('telephone');
+        $prefixeModel = new \App\Models\PrefixeModel();
+        $prefixeClient = substr($telephone, 0, 3);
+        $configPrefixe = $prefixeModel->where('prefixe', $prefixeClient)->first();
+        
+        // Pas de frais pour les clients sur réseau externe
+        $frais = 0;
+        if ($configPrefixe && $configPrefixe['type_operateur'] === 'interne') {
+            $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
+            if ($tranche) {
+                $frais = $tranche['frais'];
+            }
+        }
+        
         // Si frais inclus, le montant saisi est le montant total débité
         // Il faut trouver la tranche basée sur le montant net (montant - frais)
         if ($fraisInclus) {
-            // Pour déterminer les frais, on itère pour trouver la bonne tranche
-            // Le montant net doit être tel que: montant_net + frais(montant_net) = montant_total
-            $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
-            if (!$tranche) {
-                return $this->response->setJSON(['frais' => null, 'error' => 'Hors barème']);
-            }
-            
-            // Approximation: on suppose que les frais sont basés sur le montant net
-            // On utilise le montant saisi comme référence pour la tranche (simplification)
-            $frais = $tranche['frais'];
             $montantNet = $montant - $frais;
             
             return $this->response->setJSON([
@@ -46,12 +51,6 @@ class RetraitController extends BaseController
             ]);
         } else {
             // Comportement normal: frais s'ajoutent au montant
-            $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
-            if (!$tranche) {
-                return $this->response->setJSON(['frais' => null, 'error' => 'Hors barème']);
-            }
-            
-            $frais = $tranche['frais'];
             $montantTotal = $montant + $frais;
             
             return $this->response->setJSON([
