@@ -79,6 +79,14 @@ CREATE TABLE transactions (
     CHECK (frais >= 0.0)
 );
 
+CREATE TABLE IF NOT EXISTS promotions(
+    id INTEGER PRIMARY KEY KEY AUTOINCREMENT,
+    pourcentage REAL NOT NULL DEFAULT 0.0,
+    est_actif INTEGER DEFAULT 1
+);
+
+INSERT INTO promotions (pourcentage,est_actif) VALUES (15.0,1);
+
 
 
 INSERT INTO bareme_frais (type_operation, montant_min, montant_max, frais) VALUES
@@ -133,6 +141,7 @@ ALTER TABLE config_prefixes ADD COLUMN commission_pourcentage REAL DEFAULT 0;
 ALTER TABLE transactions ADD COLUMN frais_inclus INTEGER NOT NULL DEFAULT 0; 
 ALTER TABLE transactions ADD COLUMN groupe_envoi TEXT DEFAULT NULL; 
 ALTER TABLE transactions ADD COLUMN commission REAL NOT NULL DEFAULT 0; 
+
 
 -- 3. Insertion des nouvelles données de la Version 2
 INSERT INTO config_prefixes (nom_operateur, prefixe, type_operateur) VALUES ('M-Money', '035', 'interne');
