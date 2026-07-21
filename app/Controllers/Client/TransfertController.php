@@ -65,17 +65,23 @@ class TransfertController extends BaseController
         $configPrefixe = $prefixeModel->where('prefixe', $prefixeDest)->first();
         $commission = 0;
         
-        if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
-            $commission = ($montant * $configPrefixe['commission_pourcentage']) / 100;
-        }
-        
         if ($fraisInclus) {
-            // Le montant saisi est le total débité (frais inclus)
+            // Le montant saisi est le total débité, on doit d'abord calculer le montant net
+            // Pour cela, on estime la commission sur le montant saisi, puis on recalcule
+            $commissionEstimee = ($montant * $configPrefixe['commission_pourcentage']) / 100;
+            $montantNetEstime = $montant - $frais - $commissionEstimee;
+            // Recalculer la commission sur le montant net réel
+            if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+                $commission = ($montantNetEstime * $configPrefixe['commission_pourcentage']) / 100;
+            }
             $totalDebit = $montant;
             $montantNet = $montant - $frais - $commission;
         } else {
-            // Le montant saisi est le montant net, frais et commission s'ajoutent
+            // Le montant saisi est le montant net
             $montantNet = $montant;
+            if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+                $commission = ($montant * $configPrefixe['commission_pourcentage']) / 100;
+            }
             $totalDebit = $montant + $frais + $commission;
         }
         
@@ -133,15 +139,23 @@ class TransfertController extends BaseController
         $configPrefixe = $prefixeModel->where('prefixe', $prefixeDest)->first();
         $commission = 0;
         
-        if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
-            $commission = ($montant * $configPrefixe['commission_pourcentage']) / 100;
-        }
-        
         if ($fraisInclus) {
+            // Le montant saisi est le total débité, on doit d'abord calculer le montant net
+            // Pour cela, on estime la commission sur le montant saisi, puis on recalcule
+            $commissionEstimee = ($montant * $configPrefixe['commission_pourcentage']) / 100;
+            $montantNetEstime = $montant - $frais - $commissionEstimee;
+            // Recalculer la commission sur le montant net réel
+            if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+                $commission = ($montantNetEstime * $configPrefixe['commission_pourcentage']) / 100;
+            }
             $totalDebit = $montant;
             $montantNet = $montant - $frais - $commission;
         } else {
+            // Le montant saisi est le montant net
             $montantNet = $montant;
+            if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+                $commission = ($montant * $configPrefixe['commission_pourcentage']) / 100;
+            }
             $totalDebit = $montant + $frais + $commission;
         }
         
@@ -284,18 +298,25 @@ class TransfertController extends BaseController
             $commission = 0;
             $estExterne = false;
 
-            if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
-                $estExterne = true;
-                $commission = ($montantFinal * $configPrefixe['commission_pourcentage']) / 100;
-            }
-
             if ($fraisInclus) {
-                // Le montant saisi est le total débité (frais inclus)
+                // Le montant saisi est le total débité, on doit d'abord calculer le montant net
+                // Pour cela, on estime la commission sur le montant saisi, puis on recalcule
+                $commissionEstimee = ($montantFinal * $configPrefixe['commission_pourcentage']) / 100;
+                $montantNetEstime = $montantFinal - $frais - $commissionEstimee;
+                // Recalculer la commission sur le montant net réel
+                if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+                    $estExterne = true;
+                    $commission = ($montantNetEstime * $configPrefixe['commission_pourcentage']) / 100;
+                }
                 $totalPourDestinataire = $montantFinal;
                 $montantNetDestinataire = $montantFinal - $frais - $commission;
             } else {
-                // Le montant saisi est le montant net, frais et commission s'ajoutent
+                // Le montant saisi est le montant net
                 $montantNetDestinataire = $montantFinal;
+                if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+                    $estExterne = true;
+                    $commission = ($montantFinal * $configPrefixe['commission_pourcentage']) / 100;
+                }
                 $totalPourDestinataire = $montantFinal + $frais + $commission;
             }
 
@@ -421,15 +442,23 @@ class TransfertController extends BaseController
                 $configPrefixe = $prefixeModel->where('prefixe', $prefixeDest)->first();
                 $commission = 0;
 
-                if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
-                    $commission = ($montantFinal * $configPrefixe['commission_pourcentage']) / 100;
-                }
-
                 if ($fraisInclus) {
+                    // Le montant saisi est le total débité, on doit d'abord calculer le montant net
+                    // Pour cela, on estime la commission sur le montant saisi, puis on recalcule
+                    $commissionEstimee = ($montantFinal * $configPrefixe['commission_pourcentage']) / 100;
+                    $montantNetEstime = $montantFinal - $frais - $commissionEstimee;
+                    // Recalculer la commission sur le montant net réel
+                    if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+                        $commission = ($montantNetEstime * $configPrefixe['commission_pourcentage']) / 100;
+                    }
                     $totalPourDestinataire = $montantFinal;
                     $montantNetDestinataire = $montantFinal - $frais - $commission;
                 } else {
+                    // Le montant saisi est le montant net
                     $montantNetDestinataire = $montantFinal;
+                    if ($configPrefixe && $configPrefixe['type_operateur'] === 'externe') {
+                        $commission = ($montantFinal * $configPrefixe['commission_pourcentage']) / 100;
+                    }
                     $totalPourDestinataire = $montantFinal + $frais + $commission;
                 }
                 

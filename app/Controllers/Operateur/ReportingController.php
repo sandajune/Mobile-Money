@@ -12,9 +12,9 @@ class ReportingController extends BaseController
         $dateDebut = $this->request->getGet('date_debut');
         $dateFin   = $this->request->getGet('date_fin');
 
-        // Internal gains (fees only)
+        // Internal gains (fees only) - individual operations
         $builderInterne = $db->table('transactions t')
-            ->select('t.type_operation, SUM(t.frais) as total_frais, COUNT(*) as nb_operations, SUM(t.montant) as total_montant')
+            ->select('t.id, t.type_operation, t.frais, t.commission, t.montant, t.date_transaction, t.telephone_client, t.telephone_destinataire')
             ->join('config_prefixes cp', 'SUBSTR(t.telephone_destinataire, 1, 3) = cp.prefixe OR SUBSTR(t.telephone_client, 1, 3) = cp.prefixe', 'left')
             ->where('cp.type_operateur', 'interne')
             ->whereIn('t.type_operation', ['retrait', 'transfert_envoi']);
@@ -26,12 +26,12 @@ class ReportingController extends BaseController
             $builderInterne->where('t.date_transaction <=', $dateFin . ' 23:59:59');
         }
 
-        $builderInterne->groupBy('t.type_operation');
+        $builderInterne->orderBy('t.date_transaction', 'DESC');
         $rowsInterne = $builderInterne->get()->getResultArray();
 
-        // External gains (fees + commission)
+        // External gains (fees + commission) - individual operations
         $builderExterne = $db->table('transactions t')
-            ->select('t.type_operation, SUM(t.frais + t.commission) as total_gains, COUNT(*) as nb_operations, SUM(t.montant) as total_montant')
+            ->select('t.id, t.type_operation, t.frais, t.commission, t.montant, t.date_transaction, t.telephone_client, t.telephone_destinataire')
             ->join('config_prefixes cp', 'SUBSTR(t.telephone_destinataire, 1, 3) = cp.prefixe OR SUBSTR(t.telephone_client, 1, 3) = cp.prefixe', 'left')
             ->where('cp.type_operateur', 'externe')
             ->whereIn('t.type_operation', ['retrait', 'transfert_envoi']);
@@ -43,27 +43,24 @@ class ReportingController extends BaseController
             $builderExterne->where('t.date_transaction <=', $dateFin . ' 23:59:59');
         }
 
-        $builderExterne->groupBy('t.type_operation');
+        $builderExterne->orderBy('t.date_transaction', 'DESC');
         $rowsExterne = $builderExterne->get()->getResultArray();
 
-        $gainsInterne  = [];
+        // Calculate totals
         $totalGainsInterne = 0.0;
         foreach ($rowsInterne as $row) {
-            $gainsInterne[$row['type_operation']] = $row;
-            $totalGainsInterne += (float) $row['total_frais'];
+            $totalGainsInterne += (float) $row['frais'];
         }
 
-        $gainsExterne  = [];
         $totalGainsExterne = 0.0;
         foreach ($rowsExterne as $row) {
-            $gainsExterne[$row['type_operation']] = $row;
-            $totalGainsExterne += (float) $row['total_gains'];
+            $totalGainsExterne += (float) $row['frais'] + (float) $row['commission'];
         }
 
         return view('operateur/reporting/gains', [
-            'gains_interne'     => $gainsInterne,
+            'gains_interne'     => $rowsInterne,
             'total_gains_interne' => $totalGainsInterne,
-            'gains_externe'     => $gainsExterne,
+            'gains_externe'     => $rowsExterne,
             'total_gains_externe' => $totalGainsExterne,
             'date_debut'        => $dateDebut,
             'date_fin'          => $dateFin,
@@ -109,6 +106,8 @@ class ReportingController extends BaseController
         $dateFin   = $this->request->getGet('date_fin');
 
         // Query to get amounts to send to each external operator
+        // Le montant à reverser = montantNet (seul le montant reçu par le destinataire est reversé)
+        // Les frais internes et commissions restent pour l'opérateur interne
         $builder = $db->table('transactions t')
             ->select('cp.nom_operateur, COUNT(DISTINCT t.id) as nb_transferts, SUM(t.montant) as total_montant')
             ->join('config_prefixes cp', 'SUBSTR(t.telephone_destinataire, 1, 3) = cp.prefixe', 'inner')

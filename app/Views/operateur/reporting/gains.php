@@ -49,7 +49,7 @@
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="externe-tab" data-bs-toggle="tab" data-bs-target="#externe" type="button" role="tab">
-            <i class="bi bi-globe"></i> Gains réseau externe (commissions)
+            <i class="bi bi-globe"></i> Gains réseau externe
         </button>
     </li>
 </ul>
@@ -74,9 +74,12 @@
                         <i class="bi bi-cash-stack"></i>
                     </div>
                     <div class="stat-label">Gains sur retraits (interne)</div>
-                    <?php $r = $gains_interne['retrait'] ?? null; ?>
-                    <div class="stat-value"><?= $r ? number_format($r['total_frais'], 0, '', ' ') : 0 ?> Ar</div>
-                    <small class="text-muted"><?= $r ? $r['nb_operations'] : 0 ?> opération(s)</small>
+                    <?php 
+                    $retraits = array_filter($gains_interne, fn($r) => $r['type_operation'] === 'retrait');
+                    $totalRetraits = array_sum(array_column($retraits, 'frais'));
+                    ?>
+                    <div class="stat-value"><?= number_format($totalRetraits, 0, '', ' ') ?> Ar</div>
+                    <small class="text-muted"><?= count($retraits) ?> opération(s)</small>
                 </div>
             </div>
             <div class="col-md-4">
@@ -85,9 +88,12 @@
                         <i class="bi bi-arrow-left-right"></i>
                     </div>
                     <div class="stat-label">Gains sur transferts (interne)</div>
-                    <?php $t = $gains_interne['transfert_envoi'] ?? null; ?>
-                    <div class="stat-value"><?= $t ? number_format($t['total_frais'], 0, '', ' ') : 0 ?> Ar</div>
-                    <small class="text-muted"><?= $t ? $t['nb_operations'] : 0 ?> opération(s)</small>
+                    <?php 
+                    $transferts = array_filter($gains_interne, fn($r) => $r['type_operation'] === 'transfert_envoi');
+                    $totalTransferts = array_sum(array_column($transferts, 'frais'));
+                    ?>
+                    <div class="stat-value"><?= number_format($totalTransferts, 0, '', ' ') ?> Ar</div>
+                    <small class="text-muted"><?= count($transferts) ?> opération(s)</small>
                 </div>
             </div>
         </div>
@@ -95,38 +101,42 @@
         <!-- Tableau détaillé - Interne -->
         <div class="card shadow-sm">
             <div class="card-header bg-white">
-                <i class="bi bi-table"></i> Détail par type d'opération (réseau interne)
+                <i class="bi bi-table"></i> Détail des opérations (réseau interne)
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle">
                         <thead class="table-dark">
                             <tr>
-                                <th>Type d'opération</th>
-                                <th class="text-end">Nombre d'opérations</th>
-                                <th class="text-end">Volume total (Ar)</th>
-                                <th class="text-end">Gains (frais) (Ar)</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Émetteur</th>
+                                <th>Destinataire</th>
+                                <th class="text-end">Montant (Ar)</th>
+                                <th class="text-end">Gains (Ar)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (!empty($gains_interne)): ?>
-                                <?php foreach ($gains_interne as $type => $row): ?>
+                                <?php foreach ($gains_interne as $row): ?>
                                 <tr>
+                                    <td><?= date('d/m/Y H:i', strtotime($row['date_transaction'])) ?></td>
                                     <td>
-                                        <?php if ($type === 'retrait'): ?>
-                                            <span class="badge bg-warning fs-6"><i class="bi bi-cash-stack"></i> Retrait</span>
+                                        <?php if ($row['type_operation'] === 'retrait'): ?>
+                                            <span class="badge bg-warning"><i class="bi bi-cash-stack"></i> Retrait</span>
                                         <?php else: ?>
-                                            <span class="badge bg-success fs-6"><i class="bi bi-arrow-left-right"></i> Transfert (envoi)</span>
+                                            <span class="badge bg-success"><i class="bi bi-arrow-left-right"></i> Transfert</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-end"><?= number_format($row['nb_operations'], 0, '', ' ') ?></td>
-                                    <td class="text-end"><?= number_format($row['total_montant'], 0, '', ' ') ?> Ar</td>
-                                    <td class="text-end fw-bold text-success"><?= number_format($row['total_frais'], 0, '', ' ') ?> Ar</td>
+                                    <td><?= esc($row['telephone_client']) ?></td>
+                                    <td><?= esc($row['telephone_destinataire']) ?></td>
+                                    <td class="text-end"><?= number_format($row['montant'], 0, '', ' ') ?> Ar</td>
+                                    <td class="text-end fw-bold text-success"><?= number_format($row['frais'], 0, '', ' ') ?> Ar</td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
+                                    <td colspan="6" class="text-center text-muted py-4">
                                         <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                         Aucune opération interne enregistrée pour cette période.
                                     </td>
@@ -136,9 +146,7 @@
                         <?php if (!empty($gains_interne)): ?>
                         <tfoot class="table-dark">
                             <tr>
-                                <th>TOTAL</th>
-                                <th class="text-end"><?= number_format(array_sum(array_column($gains_interne, 'nb_operations')), 0, '', ' ') ?></th>
-                                <th class="text-end"><?= number_format(array_sum(array_column($gains_interne, 'total_montant')), 0, '', ' ') ?> Ar</th>
+                                <th colspan="5">TOTAL</th>
                                 <th class="text-end text-success"><?= number_format($total_gains_interne, 0, '', ' ') ?> Ar</th>
                             </tr>
                         </tfoot>
@@ -168,9 +176,12 @@
                         <i class="bi bi-cash-stack"></i>
                     </div>
                     <div class="stat-label">Gains sur retraits (externe)</div>
-                    <?php $r = $gains_externe['retrait'] ?? null; ?>
-                    <div class="stat-value"><?= $r ? number_format($r['total_gains'], 0, '', ' ') : 0 ?> Ar</div>
-                    <small class="text-muted"><?= $r ? $r['nb_operations'] : 0 ?> opération(s)</small>
+                    <?php 
+                    $retraits = array_filter($gains_externe, fn($r) => $r['type_operation'] === 'retrait');
+                    $totalRetraits = array_sum(array_map(fn($r) => $r['frais'] + $r['commission'], $retraits));
+                    ?>
+                    <div class="stat-value"><?= number_format($totalRetraits, 0, '', ' ') ?> Ar</div>
+                    <small class="text-muted"><?= count($retraits) ?> opération(s)</small>
                 </div>
             </div>
             <div class="col-md-4">
@@ -179,9 +190,12 @@
                         <i class="bi bi-arrow-left-right"></i>
                     </div>
                     <div class="stat-label">Gains sur transferts (externe)</div>
-                    <?php $t = $gains_externe['transfert_envoi'] ?? null; ?>
-                    <div class="stat-value"><?= $t ? number_format($t['total_gains'], 0, '', ' ') : 0 ?> Ar</div>
-                    <small class="text-muted"><?= $t ? $t['nb_operations'] : 0 ?> opération(s)</small>
+                    <?php 
+                    $transferts = array_filter($gains_externe, fn($r) => $r['type_operation'] === 'transfert_envoi');
+                    $totalTransferts = array_sum(array_map(fn($r) => $r['frais'] + $r['commission'], $transferts));
+                    ?>
+                    <div class="stat-value"><?= number_format($totalTransferts, 0, '', ' ') ?> Ar</div>
+                    <small class="text-muted"><?= count($transferts) ?> opération(s)</small>
                 </div>
             </div>
         </div>
@@ -189,38 +203,42 @@
         <!-- Tableau détaillé - Externe -->
         <div class="card shadow-sm">
             <div class="card-header bg-white">
-                <i class="bi bi-table"></i> Détail par type d'opération (réseau externe - frais + commissions)
+                <i class="bi bi-table"></i> Détail des opérations (réseau externe)
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle">
                         <thead class="table-dark">
                             <tr>
-                                <th>Type d'opération</th>
-                                <th class="text-end">Nombre d'opérations</th>
-                                <th class="text-end">Volume total (Ar)</th>
-                                <th class="text-end">Gains (frais + commissions) (Ar)</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Émetteur</th>
+                                <th>Destinataire</th>
+                                <th class="text-end">Montant (Ar)</th>
+                                <th class="text-end">Gains (Ar)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (!empty($gains_externe)): ?>
-                                <?php foreach ($gains_externe as $type => $row): ?>
+                                <?php foreach ($gains_externe as $row): ?>
                                 <tr>
+                                    <td><?= date('d/m/Y H:i', strtotime($row['date_transaction'])) ?></td>
                                     <td>
-                                        <?php if ($type === 'retrait'): ?>
-                                            <span class="badge bg-warning fs-6"><i class="bi bi-cash-stack"></i> Retrait</span>
+                                        <?php if ($row['type_operation'] === 'retrait'): ?>
+                                            <span class="badge bg-warning"><i class="bi bi-cash-stack"></i> Retrait</span>
                                         <?php else: ?>
-                                            <span class="badge bg-success fs-6"><i class="bi bi-arrow-left-right"></i> Transfert (envoi)</span>
+                                            <span class="badge bg-success"><i class="bi bi-arrow-left-right"></i> Transfert</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-end"><?= number_format($row['nb_operations'], 0, '', ' ') ?></td>
-                                    <td class="text-end"><?= number_format($row['total_montant'], 0, '', ' ') ?> Ar</td>
-                                    <td class="text-end fw-bold text-info"><?= number_format($row['total_gains'], 0, '', ' ') ?> Ar</td>
+                                    <td><?= esc($row['telephone_client']) ?></td>
+                                    <td><?= esc($row['telephone_destinataire']) ?></td>
+                                    <td class="text-end"><?= number_format($row['montant'], 0, '', ' ') ?> Ar</td>
+                                    <td class="text-end fw-bold text-info"><?= number_format($row['frais'] + $row['commission'], 0, '', ' ') ?> Ar</td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
+                                    <td colspan="6" class="text-center text-muted py-4">
                                         <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                         Aucune opération externe enregistrée pour cette période.
                                     </td>
@@ -230,9 +248,7 @@
                         <?php if (!empty($gains_externe)): ?>
                         <tfoot class="table-dark">
                             <tr>
-                                <th>TOTAL</th>
-                                <th class="text-end"><?= number_format(array_sum(array_column($gains_externe, 'nb_operations')), 0, '', ' ') ?></th>
-                                <th class="text-end"><?= number_format(array_sum(array_column($gains_externe, 'total_montant')), 0, '', ' ') ?> Ar</th>
+                                <th colspan="5">TOTAL</th>
                                 <th class="text-end text-info"><?= number_format($total_gains_externe, 0, '', ' ') ?> Ar</th>
                             </tr>
                         </tfoot>
