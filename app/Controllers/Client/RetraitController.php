@@ -5,6 +5,7 @@ use App\Controllers\BaseController;
 use App\Models\BaremeFraisModel;
 use App\Models\ClientModel;
 use App\Models\TransactionModel;
+use App\Models\PromotionModel;
 
 class RetraitController extends BaseController
 {
@@ -20,9 +21,50 @@ class RetraitController extends BaseController
         if ($montant <= 0) {
             return $this->response->setJSON(['frais' => null, 'error' => 'Montant invalide']);
         }
+<<<<<<< Updated upstream
         $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
         if (!$tranche) {
             return $this->response->setJSON(['frais' => null, 'error' => 'Hors barème']);
+=======
+        
+        // Vérifier si le client est sur un réseau interne ou externe
+        $telephone = session()->get('telephone');
+        $prefixeModel = new \App\Models\PrefixeModel();
+        $prefixeClient = substr($telephone, 0, 3);
+        $configPrefixe = $prefixeModel->where('prefixe', $prefixeClient)->first();
+        
+        // Pas de frais pour les clients sur réseau externe
+        $frais = 0;
+        if ($configPrefixe && $configPrefixe['type_operateur'] === 'interne') {
+            $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
+            if ($tranche) {
+                $frais = $tranche['frais'];
+                // Appliquer la promotion si active
+                $promotionModel = new PromotionModel();
+                $frais = $promotionModel->applyPromotion($frais);
+            }
+        }
+        
+        // Si frais inclus, le montant saisi est le montant total débité
+        if ($fraisInclus) {
+            $montantNet = $montant - $frais;
+            
+            return $this->response->setJSON([
+                'frais' => $frais,
+                'montant_net' => max(0, $montantNet),
+                'montant_total' => $montant,
+                'frais_inclus' => true
+            ]);
+        } else {
+            $montantTotal = $montant + $frais;
+            
+            return $this->response->setJSON([
+                'frais' => $frais,
+                'montant_net' => $montant,
+                'montant_total' => $montantTotal,
+                'frais_inclus' => false
+            ]);
+>>>>>>> Stashed changes
         }
         return $this->response->setJSON(['frais' => $tranche['frais']]);
     }
@@ -36,10 +78,30 @@ class RetraitController extends BaseController
         }
 
         $montant  = (float) $montant;
+<<<<<<< Updated upstream
         $tranche  = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
 
         if (!$tranche) {
             return redirect()->back()->with('error', 'Aucun barème de frais disponible pour ce montant. Vérifiez les tarifs en vigueur.');
+=======
+        
+        // Vérifier si le client est sur un réseau interne ou externe
+        $telephone = session()->get('telephone');
+        $prefixeModel = new \App\Models\PrefixeModel();
+        $prefixeClient = substr($telephone, 0, 3);
+        $configPrefixe = $prefixeModel->where('prefixe', $prefixeClient)->first();
+        
+        // Pas de frais pour les clients sur réseau externe
+        $frais = 0;
+        if ($configPrefixe && $configPrefixe['type_operateur'] === 'interne') {
+            $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
+            if ($tranche) {
+                $frais = $tranche['frais'];
+                // Appliquer la promotion si active
+                $promotionModel = new PromotionModel();
+                $frais = $promotionModel->applyPromotion($frais);
+            }
+>>>>>>> Stashed changes
         }
 
         $frais      = $tranche['frais'];
@@ -69,10 +131,30 @@ class RetraitController extends BaseController
         }
 
         $montant = (float) $montant;
+<<<<<<< Updated upstream
         $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
 
         if (!$tranche) {
             return redirect()->to(base_url('client/retrait'))->with('error', 'Aucun barème de frais disponible pour ce montant.');
+=======
+        
+        // Vérifier si le client est sur un réseau interne ou externe
+        $telephone = session()->get('telephone');
+        $prefixeModel = new \App\Models\PrefixeModel();
+        $prefixeClient = substr($telephone, 0, 3);
+        $configPrefixe = $prefixeModel->where('prefixe', $prefixeClient)->first();
+        
+        // Pas de frais pour les clients sur réseau externe
+        $frais = 0;
+        if ($configPrefixe && $configPrefixe['type_operateur'] === 'interne') {
+            $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
+            if ($tranche) {
+                $frais = $tranche['frais'];
+                // Appliquer la promotion si active
+                $promotionModel = new PromotionModel();
+                $frais = $promotionModel->applyPromotion($frais);
+            }
+>>>>>>> Stashed changes
         }
 
         $frais      = $tranche['frais'];
