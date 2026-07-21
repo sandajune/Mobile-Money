@@ -235,6 +235,18 @@ class TransfertController extends BaseController
             return redirect()->back()->with('error', 'Veuillez ajouter au moins un destinataire valide.');
         }
 
+        // Vérifier que tous les destinataires sont sur le même opérateur
+        $prefixeModel = new PrefixeModel();
+        $prefixes = [];
+        foreach ($destinataires as $telephoneDest) {
+            $prefixe = substr($telephoneDest, 0, 3);
+            $prefixes[] = $prefixe;
+        }
+        $prefixesUniques = array_unique($prefixes);
+        if (count($prefixesUniques) > 1) {
+            return redirect()->back()->with('error', 'L\'envoi multiple n\'est autorisé que vers des numéros du même opérateur. Veuillez sélectionner des numéros avec le même préfixe.');
+        }
+
         if (empty($montant) || !is_numeric($montant) || (float)$montant <= 0) {
             return redirect()->back()->with('error', 'Le montant doit être un nombre supérieur à 0.');
         }
@@ -373,6 +385,18 @@ class TransfertController extends BaseController
 
         if (empty($destinataires) || empty($montant) || !is_numeric($montant) || (float)$montant <= 0) {
             return redirect()->to(base_url('client/transfert/multiple'))->with('error', 'Données invalides.');
+        }
+
+        // Vérifier que tous les destinataires sont sur le même opérateur
+        $prefixeModel = new PrefixeModel();
+        $prefixes = [];
+        foreach ($destinataires as $telephoneDest) {
+            $prefixe = substr($telephoneDest, 0, 3);
+            $prefixes[] = $prefixe;
+        }
+        $prefixesUniques = array_unique($prefixes);
+        if (count($prefixesUniques) > 1) {
+            return redirect()->to(base_url('client/transfert/multiple'))->with('error', 'L\'envoi multiple n\'est autorisé que vers des numéros du même opérateur. Veuillez sélectionner des numéros avec le même préfixe.');
         }
 
         $montant = (float)$montant;

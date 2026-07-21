@@ -73,13 +73,21 @@ class RetraitController extends BaseController
         }
 
         $montant  = (float) $montant;
-        $tranche  = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
-
-        if (!$tranche) {
-            return redirect()->back()->with('error', 'Aucun barème de frais disponible pour ce montant. Vérifiez les tarifs en vigueur.');
+        
+        // Vérifier si le client est sur un réseau interne ou externe
+        $telephone = session()->get('telephone');
+        $prefixeModel = new \App\Models\PrefixeModel();
+        $prefixeClient = substr($telephone, 0, 3);
+        $configPrefixe = $prefixeModel->where('prefixe', $prefixeClient)->first();
+        
+        // Pas de frais pour les clients sur réseau externe
+        $frais = 0;
+        if ($configPrefixe && $configPrefixe['type_operateur'] === 'interne') {
+            $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
+            if ($tranche) {
+                $frais = $tranche['frais'];
+            }
         }
-
-        $frais = $tranche['frais'];
         
         if ($fraisInclus) {
             // Le montant saisi est le total débité (frais inclus)
@@ -118,13 +126,21 @@ class RetraitController extends BaseController
         }
 
         $montant = (float) $montant;
-        $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
-
-        if (!$tranche) {
-            return redirect()->to(base_url('client/retrait'))->with('error', 'Aucun barème de frais disponible pour ce montant.');
+        
+        // Vérifier si le client est sur un réseau interne ou externe
+        $telephone = session()->get('telephone');
+        $prefixeModel = new \App\Models\PrefixeModel();
+        $prefixeClient = substr($telephone, 0, 3);
+        $configPrefixe = $prefixeModel->where('prefixe', $prefixeClient)->first();
+        
+        // Pas de frais pour les clients sur réseau externe
+        $frais = 0;
+        if ($configPrefixe && $configPrefixe['type_operateur'] === 'interne') {
+            $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
+            if ($tranche) {
+                $frais = $tranche['frais'];
+            }
         }
-
-        $frais = $tranche['frais'];
         
         if ($fraisInclus) {
             $totalDebit = $montant;
