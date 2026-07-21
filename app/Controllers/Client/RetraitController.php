@@ -21,11 +21,6 @@ class RetraitController extends BaseController
         if ($montant <= 0) {
             return $this->response->setJSON(['frais' => null, 'error' => 'Montant invalide']);
         }
-<<<<<<< Updated upstream
-        $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
-        if (!$tranche) {
-            return $this->response->setJSON(['frais' => null, 'error' => 'Hors barème']);
-=======
         
         // Vérifier si le client est sur un réseau interne ou externe
         $telephone = session()->get('telephone');
@@ -45,28 +40,7 @@ class RetraitController extends BaseController
             }
         }
         
-        // Si frais inclus, le montant saisi est le montant total débité
-        if ($fraisInclus) {
-            $montantNet = $montant - $frais;
-            
-            return $this->response->setJSON([
-                'frais' => $frais,
-                'montant_net' => max(0, $montantNet),
-                'montant_total' => $montant,
-                'frais_inclus' => true
-            ]);
-        } else {
-            $montantTotal = $montant + $frais;
-            
-            return $this->response->setJSON([
-                'frais' => $frais,
-                'montant_net' => $montant,
-                'montant_total' => $montantTotal,
-                'frais_inclus' => false
-            ]);
->>>>>>> Stashed changes
-        }
-        return $this->response->setJSON(['frais' => $tranche['frais']]);
+        return $this->response->setJSON(['frais' => $frais]);
     }
 
     public function preview()
@@ -78,12 +52,6 @@ class RetraitController extends BaseController
         }
 
         $montant  = (float) $montant;
-<<<<<<< Updated upstream
-        $tranche  = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
-
-        if (!$tranche) {
-            return redirect()->back()->with('error', 'Aucun barème de frais disponible pour ce montant. Vérifiez les tarifs en vigueur.');
-=======
         
         // Vérifier si le client est sur un réseau interne ou externe
         $telephone = session()->get('telephone');
@@ -101,10 +69,8 @@ class RetraitController extends BaseController
                 $promotionModel = new PromotionModel();
                 $frais = $promotionModel->applyPromotion($frais);
             }
->>>>>>> Stashed changes
         }
 
-        $frais      = $tranche['frais'];
         $totalDebit = $montant + $frais;
         $client     = (new ClientModel())->find(session()->get('id'));
 
@@ -148,10 +114,8 @@ class RetraitController extends BaseController
                 $promotionModel = new PromotionModel();
                 $frais = $promotionModel->applyPromotion($frais);
             }
->>>>>>> Stashed changes
         }
 
-        $frais      = $tranche['frais'];
         $totalDebit = $montant + $frais;
         $clientId   = session()->get('id');
         $telephone  = session()->get('telephone');
