@@ -131,12 +131,6 @@ class RetraitController extends BaseController
         }
 
         $montant = (float) $montant;
-<<<<<<< Updated upstream
-        $tranche = (new BaremeFraisModel())->getFraisForMontant($montant, 'retrait');
-
-        if (!$tranche) {
-            return redirect()->to(base_url('client/retrait'))->with('error', 'Aucun barème de frais disponible pour ce montant.');
-=======
         
         // Vérifier si le client est sur un réseau interne ou externe
         $telephone = session()->get('telephone');
